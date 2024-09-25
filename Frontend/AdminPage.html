@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Orders</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            margin: 20px;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 15px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            text-align: center;
+        }
+
+        .card-content {
+            display: flex;
+            padding: 20px;
+        }
+
+        .description {
+            flex: 2;
+            margin-right: 10px;
+        }
+
+        .image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image img {
+            width: 100px; 
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .pending {
+            background-color: #ffbf00;
+        }
+
+        .approve {
+            background-color: #28a745;
+        }
+
+        .cancel {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="admin-orders">
+        <h1>Admin Panel - Orders</h1>
+        
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchOrders();
+        });
+
+        async function fetchOrders() {
+            try {
+                const response = await fetch('http://localhost:3000/api/products');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                const orders = await response.json();
+                displayOrders(orders);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function displayOrders(orders) {
+            const adminOrdersContainer = document.getElementById('admin-orders');
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                
+                let content = `
+                    <div class="card-header">
+                        <h2>${order.title ? order.title : 'No Title Available'}</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="description">
+                            ${order.description ? `<p><strong>Description:</strong> ${order.description}</p>` : ''}
+                            ${order.type ? `<p><strong>Product Type:</strong> ${order.type}</p>` : ''}
+                            ${order.whatYouWant ? `<p><strong>What You Want:</strong> ${order.whatYouWant}</p>` : ''}
+                            ${order.price ? `<p><strong>Price:</strong> $${order.price}</p>` : ''}
+                            ${order.productUsed ? `<p><strong>Product Used:</strong> ${order.productUsed}</p>` : ''}
+                            ${order.warrantyStatus ? `<p><strong>Warranty Status:</strong> ${order.warrantyStatus}</p>` : ''}
+                            ${order.donationOrg ? `<p><strong>Donation Organization:</strong> ${order.donationOrg}</p>` : ''}
+                            ${order.pickupDateTime ? `<p><strong>Pickup Date/Time:</strong> ${order.pickupDateTime}</p>` : ''}
+                            ${order.location ? `<p><strong>Location:</strong> ${order.location}</p>` : ''}
+                        </div>
+                        <div class="image">
+                            ${order.photoURL ? `<img src="${order.photoURL}" alt="Product Image">` : '<p>No Image Available</p>'}
+                        </div>
+                    </div>
+                    <div class="status ${order.status ? order.status.toLowerCase() : 'unknown'}">
+                        ${order.status ? order.status : 'Status Unknown'}
+                    </div>
+                `;
+
+                card.innerHTML = content;
+                adminOrdersContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>

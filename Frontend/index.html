@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apparel Donation & Recycling Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            
+        }
+
+        .dot-spinner {
+            display: flex;
+            justify-content: space-between;
+            width: 50px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: dot-blink 1s infinite alternate;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dot-blink {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        
+        .success-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            text-align: center;
+            display: none;
+        }
+
+        .success-box h2 {
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        .success-box .btn {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .success-box .btn.done-btn {
+            background-color: #f44336;
+        }
+
+        .success-box .btn:hover {
+            background-color: #45a049;
+        }
+
+
+        .blur-background {
+            filter: blur(5px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Submit Product for Disposal, Donation, or Recycling</h1>
+
+        <form id="product-form">
+            
+            <label for="productTitle">Product Title:</label>
+            <input type="text" id="productTitle" name="productTitle" placeholder="Enter Product Title" required>
+
+            <label for="productDescription">Product Description:</label>
+            <textarea id="productDescription" name="productDescription" placeholder="Describe your product"
+                required></textarea>
+
+            <label for="productType">Type of Product:</label>
+            <select id="productType" name="productType" required>
+                <option value="Electronics">Electronics</option>
+                <option value="Iron">Iron</option>
+                <option value="Steel">Steel</option>
+                <option value="Plastics">Plastics</option>
+                <option value="Rubber">Rubber</option>
+                <option value="Home Appliances">Home Appliances</option>
+            </select>
+
+            <label for="whatYouWant">What You Want:</label>
+            <select id="whatYouWant" name="whatYouWant" required>
+                <option value="Sell">Sell</option>
+                <option value="Replace">Replace</option>
+                <option value="Donation">Donation</option>
+            </select>
+
+            <div id="donationContainer" class="hidden container">
+                <label for="donationOrg">By Whom You Want to Donate:</label>
+                <select id="donationOrg" name="donationOrg">
+                    <option value="Govt Org">Govt Org</option>
+                    <option value="Pvt Org">Pvt Org</option>
+                    <option value="Research">Research</option>
+                    <option value="Laboratories">Laboratories</option>
+                </select>
+
+                <label for="pickupDateTime">Product Pick-up Date & Time:</label>
+                <input type="datetime-local" id="pickupDateTime" name="pickupDateTime">
+            </div>
+
+            <div id="sellContainer" class="hidden container">
+                <label for="price">Enter Your Price (INR):</label>
+                <input type="number" id="price" name="price" placeholder="Enter Price">
+
+                <label for="productUsed">Product Used (in years):</label>
+                <input type="number" id="productUsed" name="productUsed">
+
+                <label for="warrantyStatus">Warranty Status:</label>
+                <select id="warrantyStatus" name="warrantyStatus">
+                    <option value="Not Expired">Not Expired</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+
+            <div id="replaceContainer" class="hidden container">
+                <label for="replaceProduct">What You Want to Get:</label>
+                <input type="text" id="replaceProduct" name="replaceProduct"
+                    placeholder="Enter what you want in exchange">
+
+                <label for="replaceProductUsed">Product Used (In Years):</label>
+                <input type="number" id="replaceProductUsed" name="replaceProductUsed" placeholder="Enter in Years">
+
+                <label for="replaceWarrantyStatus">Warranty Status:</label>
+                <select id="replaceWarrantyStatus" name="replaceWarrantyStatus">
+                    <option value="Not Expired">Not Expired</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location"><i class="fas fa-map-marker-alt"></i> Preferred Working Location</label>
+                <div class="location-input" style="display: flex;">
+                    <input type="text" id="location" name="location" placeholder="Enter your hometown" required
+                        readonly>
+                    <button type="button" id="mapBtn" class="btn" title="Select from Map"><i
+                            class="fas fa-map">👆</i></button>
+                </div>
+            </div>
+
+ 
+            <label for="productPhoto">Product Photo:</label>
+            <input type="file" id="productPhoto" name="productPhoto" accept="image/*" required>
+
+            <button type="submit" id="submit" class="submit-btn">Submit</button>
+
+
+        </form>
+
+
+
+
+        <div id="mapModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Select Your Location</h2>
+                <div class="search-container">
+                    <input type="text" id="searchBox" placeholder="Search for a location" />
+                    <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <div id="map" style="height: 300px;"></div>
+                <button id="selectLocation" class="submit-btn">Select Location</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner Overlay -->
+    <div class="spinner-overlay" id="spinner-overlay">
+        <div class="dot-spinner">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <!-- Success Box -->
+    <div class="success-box" id="success-box">
+        <h2>You are Successfully Submitted the response🥳🥳😍</h2>
+        <button class="btn" id="view-order-btn">View Order</button>
+        <button class="btn done-btn" id="done-btn">Done</button>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        let PRODUCT_ID;
+        document.getElementById('product-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+
+            document.getElementById('spinner-overlay').style.display = 'flex';
+
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('http://localhost:3000/api/products', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    
+                    document.getElementById('spinner-overlay').style.display = 'none';
+
+                    // Show Success Box
+                    document.getElementById('success-box').style.display = 'block';
+                    container.classList.add('blur-background');
+                    PRODUCT_ID = result.id;
+
+                } else {
+                    
+                    console.error('Error submitting product:', result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        
+        document.getElementById('done-btn').addEventListener('click', function () {
+            document.getElementById('success-box').style.display = 'none';
+            container.classList.remove('blur-background'); 
+            document.getElementById('product-form').reset(); // Reset form
+        });
+
+        
+        document.getElementById('view-order-btn').addEventListener('click', function () {
+            window.location.href = `Order.html?id=${PRODUCT_ID}`;
+        });
+    </script>
+
+    <script src="script.js"></script>
+    <script src="BackendJS.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+</body>
+
+</html>
