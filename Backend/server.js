@@ -67,16 +67,9 @@ const upload = multer({
 
 
 const productSchema = new mongoose.Schema({
-    title: String,
+
     description: String,
-    type: String,
-    whatYouWant: String,
     price: Number,
-    productUsed: Number,
-    warrantyStatus: String,
-    donationOrg: String,
-    pickupDateTime: Date,
-    location: String,
     photoURL: String,
     status: { type: String, default: 'Pending' },
     createdAt: { type: Date, default: Date.now }
@@ -86,7 +79,7 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', productSchema);
 
 app.post('/api/products', upload.single('productPhoto'), async (req, res) => {
-    const { productTitle, productDescription, productType, whatYouWant, donationOrg, pickupDateTime, price, productUsed, warrantyStatus, location } = req.body;
+    const {productDescription, price} = req.body;
 
     try {
         
@@ -105,16 +98,8 @@ app.post('/api/products', upload.single('productPhoto'), async (req, res) => {
 
             
             const newProduct = new Product({
-                title: productTitle,
                 description: productDescription,
-                type: productType,
-                whatYouWant,
                 price,
-                productUsed,
-                warrantyStatus,
-                donationOrg,
-                pickupDateTime,
-                location,
                 photoURL: publicUrl
             });
 
@@ -154,8 +139,7 @@ app.get('/api/products', async (req, res) => {
         res.status(500).json({ success: false, message: 'An error occurred.' });
     }
 });
-
-
+ 
 
 
 // Start server
@@ -163,3 +147,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+ 
