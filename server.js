@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 let bucket;
 
 try {
-    const serviceAccount = require('./firebaseServiceAccount.json');
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
