@@ -139,6 +139,30 @@ app.get('/api/products', async (req, res) => {
         res.status(500).json({ success: false, message: 'An error occurred.' });
     }
 });
+
+
+app.get('/api/search/product', async (req, res) => {
+    try {
+        // Fetch all workers and return only the profession field
+        const workers = await Product.find({}, 'description');
+
+        // Extract professions and flatten into a single array, splitting by commas
+        const professions = workers
+            .map(worker => worker.description)
+            .join(',')
+            .split(',')
+            .map(prof => prof.trim())
+            .filter(prof => prof.length > 0);
+
+        // Remove duplicates
+        const uniqueProfessions = [...new Set(professions)];
+
+        res.status(200).json({ professions: uniqueProfessions });
+    } catch (error) {
+        console.error('❌ Failed to fetch professions:', error);
+        res.status(500).json({ message: 'Failed to retrieve professions.' });
+    }
+});
  
 
 
