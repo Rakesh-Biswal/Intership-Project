@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Cards</title>
+    <style>
+        /* styles.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-info h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .product-info p {
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .product-info .price {
+            color: #e74c3c;
+            font-size: 1.1em;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .product-card {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="product-container" id="productContainer"></div>
+
+    <script>
+        // app.js
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productContainer = document.getElementById('productContainer');
+
+            try {
+                // Fetch products from the backend
+                const response = await fetch('http://localhost:3000/api/products');
+                const products = await response.json();
+
+                // Create product cards dynamically
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.classList.add('product-card');
+
+                    productCard.innerHTML = `
+                <img src="${product.photoURL}" alt="Product Image">
+                <div class="product-info">
+                    <h3>${product.description}</h3>
+                    <p class="price">$${product.price}</p>
+                </div>
+            `;
+
+                    productContainer.appendChild(productCard);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                productContainer.innerHTML = '<p>Failed to load products</p>';
+            }
+        });
+
+    </script>
+</body>
+
+</html>
